@@ -9,7 +9,7 @@ A first ruleset for the Quickstart
     shares hello
   }
    
-  global {
+  global testtesttesttesttesttest {
     hello = function(obj) {
       msg = "Hello " + obj;
       msg
