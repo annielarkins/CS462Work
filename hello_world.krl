@@ -27,11 +27,11 @@ A first ruleset for the Quickstart
   rule hello_monkey {
     select when echo monkey
     pre {
-      name = event:attr("name").klog("our passed in name: ") || "Monkey".klog("our default name: ")
+      //name = event:attr("name").klog("our passed in name: ") || "Monkey".klog("our default name: ")
       
-      //name = event:attr("name").klog("our passed in the name: ") 
-             //=> event:attr("name")
-             //| "Monkey".klog("using default name - Monkey")
+      name = event:attr("name").klog("our passed in the name: ") 
+             => event:attr("name")
+             | "Monkey".klog("using default name - Monkey")
     }
     send_directive("say", {"something":"Hello " + name})
   }
