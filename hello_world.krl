@@ -23,5 +23,13 @@ A first ruleset for the Quickstart
     }
     send_directive("say", {"something":"Hello " + name})
   }
+  
+  rule hello_monkey {
+    select when echo monkey
+    pre {
+      name = event:attr("name").klog("our passed in name: ")
+    }
+    send_directive("say", {"something":"Hello Monkey" + name})
+  }
    
 }
