@@ -6,7 +6,7 @@ A first ruleset for the Quickstart
 >>
     author "Phil Windley"
     logging on
-    shares hello
+    shares hello, __testing
   }
    
   global {
