@@ -29,7 +29,7 @@ A first ruleset for the Quickstart
     pre {
       name = event:attr("name").klog("our passed in name: ")
              => event:attr("name")
-             | "Monkey"
+             | "Monkey".klog("using default name - Monkey")
     }
     send_directive("say", {"something":"Hello " + name})
   }
