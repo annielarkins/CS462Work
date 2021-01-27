@@ -29,7 +29,7 @@ ruleset my_texting_app {
         | null
         limit = event:attr("limit")
         => event:attr("limit")
-        | 5
+        | null
         messages = twilio:messages(to, from, limit) 
     }
     send_directive(messages)

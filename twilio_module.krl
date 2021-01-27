@@ -20,12 +20,12 @@ ruleset com.twilio.sms {
     
     messages = function(to, from, limit) {
         base_url = <<https://#{account_sid}:#{auth_token}@api.twilio.com/2010-04-01/Accounts/>>
-        args = {"To": null, "From": null}
+        args = {"To": to, "From": from}
+        response = http:get(base_url + account_sid + "/Messages.json", args){"content"}.decode().get("messages")
         m_limit = limit
         => limit - 1
-        | 5
-        response = http:get(base_url + account_sid + "/Messages.json", args)
-        response{"content"}.decode().get("messages").slice(m_limit)
+        | response.length() - 1
+        response.slice(m_limit)
     }
     
   }
