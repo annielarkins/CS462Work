@@ -68,7 +68,7 @@ ruleset manage_sensors {
         if sensor_id.klog("found sensor_id")
             then 
                 event:send(
-                    { "eci": the_sensor.get("eci"), 
+                    { "eci": the_sensor.get("eci").klog("send installation event"), 
                     "eid": "install_rulesets_requested",
                     "domain": "wrangler", 
                     "type": "install_rulesets_requested",
