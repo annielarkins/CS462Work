@@ -1,7 +1,7 @@
 ruleset manage_sensors {
     meta {
         use module io.picolabs.wrangler alias wrangler
-        shares nameFromID, showChildren
+        shares nameFromID, showChildren, manage_sensors, sensors, getChildProfile
     }
     global {
         collection_threshold = 70
@@ -18,11 +18,16 @@ ruleset manage_sensors {
             ent:sensors
         }
 
+        getChildProfile = function(child_eci){
+          args = {}
+          wrangler:skyQuery(child_eci, "sensor_profile", "getProfile", args);
+        }
+
         manage_sensors = function(){
             showChildren().map(function(v, k){
               args = {}
               eci = v{"eci"}
-              Wrangler:skyQuery(eci,"temperature_store","temperatures",args).klog("get temp for " + eci + ": ");
+              wrangler:skyQuery(eci,"temperature_store","temperatures",args).klog("get temp for " + eci + ": ");
             })
         }
     }
@@ -41,7 +46,7 @@ ruleset manage_sensors {
             exists = ent:sensors && ent:sensors >< sensor_id
         }
         if exists then
-            send_directive("sensor_ready", {"sensor_id":sensor_id})
+            send_directive("DUPLICATE: SENSOR ALREADY EXISTS", {"sensor_id":sensor_id})
     }
 
     rule sensor_already_exists2 {
@@ -61,6 +66,7 @@ ruleset manage_sensors {
 
     rule store_new_sensor {
         select when wrangler new_child_created
+        foreach ["twilio_module", "sensor_profile", "wovyn_base", "wovyn_emitter", "temperature_store"] setting (x)
         pre {
             the_sensor = {"eci": event:attr("eci")}
             sensor_id = event:attr("sensor_id")
@@ -71,16 +77,17 @@ ruleset manage_sensors {
                     { "eci": the_sensor.get("eci").klog("send installation event"), 
                     "eid": "install_rulesets_requested",
                     "domain": "wrangler", 
-                    "type": "install_rulesets_requested",
+                    "type": "install_ruleset_request",
                     "attrs": {
-                        "absoluteURL":meta:rulesetURI,
-                        "rids": ["wovyn_base", "wovyn_emitter", "temperature_store", "sensor_profile"],
+                        "absoluteURL":meta:rulesetURI.klog("RULESET URI"),
+                        "rid": x,
                         "config": {},
                         "sensor_id":sensor_id,
                         "s_name": sensor_id,
                         "location": "Annie's Apartment",
                         "threshold_temp": collection_threshold,
-                        "sms_num": "+14103706090"
+                        "sms_num": "+14103706090",
+                        "eci": the_sensor.get("eci")
                     }
                     }
                 )

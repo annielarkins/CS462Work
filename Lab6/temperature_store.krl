@@ -78,4 +78,29 @@ ruleset temperature_store {
             ent:stored_violations := clear_temp_2
         }
     }
+
+    // rule initialize_state {
+    //     select when wrangler ruleset_installed
+    //       where event:attrs{"rids"} >< meta:rid
+    //       pre{
+    //         the_sensor = {"eci": event:attr("eci")}
+    //       }
+    //       event:send(
+    //         { "eci": the_sensor.get("eci").klog("send installation event"), 
+    //         "eid": "install_rulesets_requested",
+    //         "domain": "wrangler", 
+    //         "type": "install_ruleset_request",
+    //         "attrs": {
+    //             "absoluteURL":meta:rulesetURI.klog("RULESET URI"),
+    //             "rid": "sensor_profile",
+    //             "config": {},
+    //             "sensor_id": event:attrs{"sensor_id"},
+    //             "s_name": event:attrs{"s_name"},
+    //             "location": event:attrs{"sensor_id"},
+    //             "threshold_temp": event:attrs{"threshold_temp"},
+    //             "sms_num": "+14103706090"
+    //         }
+    //         }
+    //     )
+    //   }
 }
