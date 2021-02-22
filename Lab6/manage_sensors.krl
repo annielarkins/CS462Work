@@ -68,12 +68,14 @@ ruleset manage_sensors {
         if sensor_id.klog("found sensor_id")
             then 
                 event:send(
-                    { "eci": the_sensor.get("eci"), "eid": "install-ruleset",
-                    "domain": "wrangler", "type": "install_ruleset_request",
+                    { "eci": the_sensor.get("eci"), 
+                    "eid": "install_rulesets_requested",
+                    "domain": "wrangler", 
+                    "type": "install_rulesets_requested",
                     "attrs": {
                         "absoluteURL":meta:rulesetURI,
                         "rids": ["wovyn_base", "wovyn_emitter", "temperature_store", "sensor_profile"],
-                        "config":{},
+                        "config": {},
                         "sensor_id":sensor_id,
                         "s_name": sensor_id,
                         "location": "Annie's Apartment",
