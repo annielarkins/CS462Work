@@ -47,7 +47,7 @@ ruleset temperature_store {
             "timestamp" : timestamp
           })
           always{
-            ent:stored_temps := ent:stored_temps.defaultsTo(clear_temp, "initialization was needed");
+            ent:stored_temps := ent:stored_temps.defaultsTo(clear_temp_2, "initialization was needed");
             ent:stored_temps := ent:stored_temps.put([passed_id,"temperature"], temperature)
                                 .put([passed_id,"timestamp"], timestamp)
           }
@@ -65,7 +65,7 @@ ruleset temperature_store {
             "timestamp" : timestamp
           })
         always{
-            ent:stored_violations := ent:stored_violations.defaultsTo(clear_temp, "initialization was needed");
+            ent:stored_violations := ent:stored_violations.defaultsTo(clear_temp_2, "initialization was needed");
             ent:stored_violations := ent:stored_violations.put([passed_id,"temperature"], temperature)
                                 .put([passed_id,"timestamp"], timestamp)
         }

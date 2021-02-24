@@ -1,7 +1,7 @@
 ruleset manage_sensors {
     meta {
         use module io.picolabs.wrangler alias wrangler
-        shares nameFromID, showChildren, manage_sensors, sensors, getChildProfile
+        shares nameFromID, showChildren, manage_sensors, sensors, getChildProfile, getChildRulesets, getChildTemps
     }
     global {
         collection_threshold = 70
@@ -20,14 +20,28 @@ ruleset manage_sensors {
 
         getChildProfile = function(child_eci){
           args = {}
-          wrangler:skyQuery(child_eci, "sensor_profile", "getProfile", args);
+          // wrangler:skyQuery(child_eci, "sensor_profile", "getProfile", args);
+          ctx:query(child_eci, "sensor_profile", "getProfile", args);
+        }
+
+        getChildRulesets = function(child_eci){
+          args = {}
+          ctx:query(child_eci, "sensor_profile", "getRulesets", args);
+        }
+
+        getChildTemps = function(child_eci){
+          args = {}
+          ctx:query(child_eci, "temperature_store","temperatures", args).klog("TEST ");
         }
 
         manage_sensors = function(){
-            showChildren().map(function(v, k){
+            separates = showChildren().map(function(v, k){
               args = {}
               eci = v{"eci"}
-              wrangler:skyQuery(eci,"temperature_store","temperatures",args).klog("get temp for " + eci + ": ");
+              ctx:query(eci, "temperature_store","temperatures", args)
+            });
+            separates.values().reduce(function(a, b){
+              a.values().append(b.values())
             })
         }
     }
