@@ -10,13 +10,21 @@ def main():
     args = {"sensor_id": "Physical Device"}
     r = requests.get(url=URL, params=args)
 
-    # Get the eci and print out a string for pasting into the wovyn sensor
+    # Get the eci, pause emitter, and print out a string for pasting into the wovyn sensor
     URL = "http://localhost:3000/sky/cloud/ckldxwasd0036zqujbjxkf1um/manage_sensors/sensors"
     args = {}
     r = requests.get(url=URL, params=args)
     phys_dev_eci = r.json()["Physical Device"]['eci']
-    phys_dev_url = "http://192.168.1.20:3000/sky/event/" + phys_dev_eci + "/temp/wovyn/heartbeat"
-    print("Use this url for the sensor:", phys_dev_url)
+    phys_dev_url = "http://192.168.1.8:3000/sky/event/" + phys_dev_eci + "/temp/wovyn/heartbeat"
+
+    URL = "http://localhost:3000/sky/event/" + phys_dev_eci + "/pause/emitter/new_state"
+    args = {"pause": True}
+    r = requests.get(url=URL, params=args)
+
+    print("Manually set up the wovyn sensor now.")
+    print("Heartbeat URL Stub:", "http://192.168.1.8:3000/sky/event/****/temp/wovyn/heartbeat")
+    print("Pause Emitter URL Stub:", "http://192.168.1.8:3000/sky/event/****/pause/emitter/new_state")
+
     input("Press Enter to continue...")
 
     # Part 1 - create a first child
