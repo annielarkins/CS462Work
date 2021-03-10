@@ -21,12 +21,15 @@ ruleset manage_sensors {
         
         manage_sensors = function(){
             valid_sensors = subs:established().filter(function(v,k){
-              v{"Tx_role"} == "temperature_sensor"
+              v{"Tx_role"} == "temp_sensor"
             }).klog("FILTERED")
             separates = valid_sensors.map(function(v, k){
                 args = {}
                 eci = v{"Tx"}.klog("eci: ")
-                ctx:query(eci, "temperature_store","temperatures", args)
+                host = v{"Tx_host"}
+                //ctx:query(eci, "temperature_store","temperatures", args)
+                wrangler:picoQuery(eci, "temperature_store", 
+                "temperatures", null, host);
             });
             separates.values().reduce(function(a, b){
               a.values().append(b.values())
@@ -104,12 +107,26 @@ ruleset manage_sensors {
         sensor_id = event:attr("sensor_id").klog("CONNECT TO EXISTING")
         the_sensor = {"eci": null}
         wellKnown_eci = event:attr("wellKnown_eci")
+        hostname = event:attr("hostname") || null
       }
+      event:send({
+        "eci": wellKnown_eci,
+        "domain": "wrangler", "type": "subscription",
+        "attrs": {
+            "wellKnown_Tx": subs:wellKnown_Rx(){"id"},
+            "Tx_role": "collection", 
+            "Rx_role": "temp_sensor",
+            "name": "collection-" + sensor_id,
+            "channel_type": "subscription",
+            "Tx_host": hostname,
+            "Rx_host": "http://366a94bb8c21.ngrok.io"
+        }
+      }, hostname)
       fired {
         ent:sensors{sensor_id} := the_sensor
         ent:sensors{[sensor_id,"wellKnown_eci"]} := wellKnown_eci
-        raise sensor event "new_subscription_request".klog("RAISING SUB REQ EVENT for existing pico")
-          attributes {"sensor_id": sensor_id}
+        // raise sensor event "new_subscription_request".klog("RAISING SUB REQ EVENT for existing pico")
+        //   attributes {"sensor_id": sensor_id}
       }
     }
 
@@ -159,13 +176,30 @@ ruleset manage_sensors {
       })
     } 
 
-    rule auto_accept {
+    // rule auto_accept {
+    //   select when wrangler inbound_pending_subscription_added
+    //   pre {
+    //     my_role = event:attr("Rx_role").klog("MY ROLE")
+    //     their_role = event:attr("Tx_role").klog("THEIR ROLE")
+    //   }
+    //   if their_role=="temperature_sensor" && my_role=="sensor_collection" then noop()
+    //   fired {
+    //     raise wrangler event "pending_subscription_approval".klog("ACCEPTed SUB MAN")
+    //       attributes event:attrs
+    //     ent:subscriptionTx := event:attr("Tx")
+    //   } else {
+    //     raise wrangler event "inbound_rejection".klog("Rejected  SUB MAN")
+    //       attributes event:attrs
+    //   }
+    // }
+
+    rule auto_accept2 {
       select when wrangler inbound_pending_subscription_added
       pre {
         my_role = event:attr("Rx_role").klog("MY ROLE")
         their_role = event:attr("Tx_role").klog("THEIR ROLE")
       }
-      if their_role=="temperature_sensor" && my_role=="sensor_collection" then noop()
+      if their_role=="temp_sensor" && my_role=="collection" then noop()
       fired {
         raise wrangler event "pending_subscription_approval".klog("ACCEPTed SUB MAN")
           attributes event:attrs

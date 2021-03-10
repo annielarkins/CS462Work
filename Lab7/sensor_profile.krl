@@ -106,6 +106,24 @@ ruleset sensor_profile {
         }
       }
 
+      rule auto_accept2 {
+        select when wrangler inbound_pending_subscription_added
+        pre {
+          my_role = event:attr("Rx_role").klog("MY ROLE")
+          their_role = event:attr("Tx_role").klog("THEIR ROLE")
+        }
+        if my_role=="collection" && their_role=="temp_sensor" then noop()
+        fired {
+          raise wrangler event "pending_subscription_approval".klog("ACCEPTed22222222 SUB MAN")
+            attributes event:attrs.klog("EVENTS TO INSPECT:")
+          
+          ent:subscriptionTx := event:attr("Tx")
+        } else {
+          raise wrangler event "inbound_rejection".klog("Rejected222222222  SUB MAN")
+            attributes event:attrs
+        }
+      }
+
       rule connect_to_collection{ 
         select when sensor unconnected
         fired{
