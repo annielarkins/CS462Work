@@ -111,9 +111,10 @@ ruleset gossip {
                 "type": message_type.klog("SENDING SOMETHING from heartbeat"),             
                 "attrs":{
                         "message": m,
-                        "sensor_id": subscriber{"Tx"} //subs:wellKnown_Rx(){"id"}
-                        }
-            })
+                        "sensor_id": subscriber{"Tx"}, //subs:wellKnown_Rx(){"id"}
+                        "host": subscriber{"Tx_host"}
+                        },
+            }, subscriber{"Tx_host"})
         always{
             schedule gossip event "heartbeat" at time:add(time:now(), {"seconds": ent:hb_period.defaultsTo(10)}).klog("SENDING HEARTBEAT from HB")
         }
@@ -205,9 +206,9 @@ ruleset gossip {
                     "domain":"gossip",                     
                     "type": "rumor",             
                     "attrs":{"message": mToReturn,
-                            "sensor_id": event:attr("sensor_id") //subs:wellKnown_Rx(){"id"}
+                            "sensor_id": event:attr("sensor_id") //subs:wellKnown_Rx(){"id"},
                             }
-                })
+                }, event:attr("host"))
             always {
                 ent:smart_tracker := ent:smart_tracker.defaultsTo({}).put([eci], message).klog("updated smart tracker") if ent:process == "on"
             }
