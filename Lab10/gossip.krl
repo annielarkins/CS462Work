@@ -200,24 +200,13 @@ ruleset gossip {
             sv = ent:seen_violations{mp1}.defaultsTo(0).klog("SV")
             sv2 = (sv >= 1) => 1 | sv
             message2 = (mp2 >= 1) => 1 | mp2
-            // message_id = message.get("MessageID")
-            // origin_id = message.get("SensorId")
-            // rumor_type = message.get("RumorType")
-            // message_num = message_id.substr(message_id.length() - 1).as("Number").klog("MESSAGE NUM")
+            final_mess = (sv2 + message2 >= 1) => 1 | 0
+
         }
         if mp1 != null then noop()
         fired {
-            ent:seen_violations := ent:seen_violations.defaultsTo({}).put([mp1], sv2 + message2)
+            ent:seen_violations := ent:seen_violations.defaultsTo({}).put([mp1], final_mess)
         }
-        // always{
-        //     // updated_val1 = (ent:seen_violations{event:attr("sensor_id")}.defaultsTo(0) + message).klog("Updated val")
-        //     // updated_val2 = (updated_val1 > 0) => 1 | updated_val1
-        //     // updated_val3 = (updated_val2 < 0) => 0 | updated_val2
-
-
-        //     ent:seen_violations := ent:seen_violations.defaultsTo({}).put([mp1], sv2 + message2)
-        //     //ent:seen_violations{event:atttr("sensor_id")} := ent:seen_violations{event:attr("sensor_id")}.defaultsTo(0).klog("existing val") + message
-        // } 
     }
 
     rule add_message {
